@@ -1,0 +1,70 @@
+
+# Paste the lines printed by Magma above this line
+
+#_____________ PLOTTING CODE _______________________
+import matplotlib.pyplot as plt
+
+G = Graph(multiedges=True, loops=True)
+
+# Add vertices explicitly (needed when there are no edges)
+G.add_vertices(vertex_mult.keys())
+
+# Add edges
+G.add_edges(edge_list)
+
+# Original layout
+if G.num_verts() == 1:
+    pos = {0: (0,0)}
+else:
+    pos = G.layout('spring')
+    pos = {v: (pos[v][0]*0.5, pos[v][1]*0.5) for v in pos}
+
+internal_vertices = [v for v in G.vertices()
+                     if v not in original_vertices and v not in arrow_vertices]
+
+genusTrue = [v for v in G.vertices() if vertex_genus[v] != 0]
+
+color_map = {}
+for v in G.vertices():
+    if v in arrow_vertices:
+        color_map[v] = '#2A8A4A'
+    elif v in original_vertices:
+        color_map[v] = '#C04828'
+    else:
+        color_map[v] = '#3A6FD4'
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+for u, v in G.edges(labels=False):
+    x1, y1 = pos[u]
+    x2, y2 = pos[v]
+    ax.plot([x1, x2], [y1, y2],
+            color='black',
+            linewidth=1.5,
+            zorder=1)
+
+for v in G.vertices():
+    x, y = pos[v]
+    marker = 'D' if vertex_genus[v] > 0 else 'o'
+
+    ax.plot(x, y,
+            marker=marker,
+            markersize=40,
+            color=color_map[v],
+            markeredgecolor='black',
+            markeredgewidth=1.5,
+            zorder=2)
+
+    ax.annotate(
+        "%s\n[%s], (%s)\n(g:%s)" %
+        (v+1, vertex_mult[v], vertex_selfi[v], vertex_genus[v]),
+        xy=(x, y),
+        ha='center',
+        va='center',
+        fontsize=8,
+        zorder=3
+    )
+
+ax.axis('off')
+plt.tight_layout()
+plt.show()
