@@ -2,11 +2,13 @@ A<x,y> := AffineSpace(Rationals(),2);
 // ______________input________________
 
 //Input the value for the power of t:
-k := 3;
+k := ;
 //Input a polynomial in terms of x and y (and k if needed):
-curve := -x^5+y^2;
+curve := ;
 // ___________________________________
+
 printf "Data for equation %o and parameter k=%o\n\n", curve, k;
+
 //_____________Subordinate Functions_______________
 string_type_solution := function(u, v, a)
     u := Integers()!u;
