@@ -1,4 +1,5 @@
 A<x,y> := AffineSpace(Rationals(),2);
+
 // ______________input________________
 
 //Input the value for the power of t:
