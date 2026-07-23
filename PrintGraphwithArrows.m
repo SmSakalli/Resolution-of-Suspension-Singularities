@@ -1,13 +1,11 @@
 A<x,y> := AffineSpace(Rationals(),2);
-
 // ______________input________________
 
 //Input the value for the power of t:
-k := ;
+k := 3;
 //Input a polynomial in terms of x and y (and k if needed):
-curve := ;
+curve := -x^5+y^2;
 // ___________________________________
-
 printf "Data for equation %o and parameter k=%o\n\n", curve, k;
 
 //_____________Subordinate Functions_______________
@@ -381,33 +379,29 @@ GetNeighbours := function(u,edge_list)
   return [e[1] eq u select e[2] else e[1] : e in edge_list | e[1] eq u or e[2] eq u];
 end function;
 
+//Added for parallel edges:
+HasParallelEdges := function(u,edge_list)
+    nbrs := [e[1] eq u select e[2] else e[1] :
+             e in edge_list | e[1] eq u or e[2] eq u];
 
-// Loop to eliminate (-1)-rational curves until no change is possible.
+    return #nbrs ne #Setseq(SequenceToSet(nbrs));
+end function;
+
+
+print "\n=== BLOWDOWN OF (-1)-LEAVES ===";
 
 repeat
     changed := false;
 
     // ---------- degree 1 ----------
-    deg_1_list := [];
-    for v in Alldeg(H,1) do
-        if H_selfi[Index(v)] eq -1 and
-           H_genus[Index(v)] eq 0 and
-           not (Index(v) in H_arrow_vertices) then
-            Append(~deg_1_list,Index(v));
-        end if;
-    end for;
+    for i in [1..total_H] do
+        nbrs := GetNeighbours(i,H_edges);
 
-    counter := #deg_1_list;
-    if counter gt 0 then
-        changed := true;
-    end if;
+        if #nbrs eq 1 and not HasParallelEdges(i,H_edges)
+   and H_selfi[i] eq -1 and H_genus[i] eq 0 
+   and not (i in H_arrow_vertices) then
 
-    while counter gt 0 do
-        i := deg_1_list[counter];
-
-        if H_selfi[i] eq -1 and H_genus[i] eq 0 then
-
-            nbr := GetNeighbours(i,H_edges)[1];
+            nbr := nbrs[1];
             H_selfi[nbr] +:= 1;
 
             reindex := [j lt i select j else j-1 : j in [1..total_H]];
@@ -418,53 +412,35 @@ repeat
             H_origin := [H_origin[j] : j in [1..total_H] | j ne i];
 
             H_edges := [[reindex[e[1]],reindex[e[2]]]
-                        : e in H_edges
-                        | not (e[1] eq i or e[2] eq i)];
+                         : e in H_edges | e[1] ne i and e[2] ne i];
 
+            H_arrow_vertices := [j : j in H_arrow_vertices | j ne i];
             H_arrow_vertices := [reindex[j] : j in H_arrow_vertices];
 
-            deg_1_list := [j : j in deg_1_list | j ne i];
-            deg_1_list := [reindex[j] : j in deg_1_list];
-
             total_H -:= 1;
-        end if;
 
-        counter -:= 1;
-    end while;
+            H := MultiGraph< total_H | >;
+            VH := Vertices(H);
+            for e in H_edges do
+                AddEdge(~H,VH[e[1]],VH[e[2]]);
+            end for;
+
+            changed := true;
+            break;
+        end if;
+    end for;
 
     if changed then
-        H := MultiGraph< total_H | >;
-        VH := Vertices(H);
-        for e in H_edges do
-            AddEdge(~H,VH[e[1]],VH[e[2]]);
-        end for;
-
         continue;
     end if;
 
     // ---------- degree 2 ----------
-    deg_2_list := [];
-    for v in Alldeg(H,2) do
-        if H_selfi[Index(v)] eq -1 and
-           H_genus[Index(v)] eq 0 and
-           not (Index(v) in H_arrow_vertices) then
-            Append(~deg_2_list,Index(v));
-        end if;
-    end for;
-
-    counter := #deg_2_list;
-    if counter gt 0 then
-        changed := true;
-    end if;
-
-    while counter gt 0 do
-        i := deg_2_list[counter];
-
+    for i in [1..total_H] do
         nbrs := GetNeighbours(i,H_edges);
 
-        if #nbrs eq 2 and
-           H_selfi[i] eq -1 and
-           H_genus[i] eq 0 then
+        if #nbrs eq 2 and not HasParallelEdges(i,H_edges)
+   and H_selfi[i] eq -1 and H_genus[i] eq 0
+   and not (i in H_arrow_vertices) then
 
             nbr1 := nbrs[1];
             nbr2 := nbrs[2];
@@ -480,35 +456,31 @@ repeat
             H_origin := [H_origin[j] : j in [1..total_H] | j ne i];
 
             H_edges := [[reindex[e[1]],reindex[e[2]]]
-                        : e in H_edges
-                        | not (e[1] eq i or e[2] eq i)];
+                         : e in H_edges | e[1] ne i and e[2] ne i];
 
             Append(~H_edges,[reindex[nbr1],reindex[nbr2]]);
 
             H_arrow_vertices := [reindex[j] : j in H_arrow_vertices];
 
-            deg_2_list := [j : j in deg_2_list | j ne i];
-            deg_2_list := [reindex[j] : j in deg_2_list];
-
             total_H -:= 1;
+
+            H := MultiGraph< total_H | >;
+            VH := Vertices(H);
+            for e in H_edges do
+                AddEdge(~H,VH[e[1]],VH[e[2]]);
+            end for;
+
+            changed := true;
+            break;
         end if;
-
-        counter -:= 1;
-    end while;
-
-    if changed then
-        H := MultiGraph< total_H | >;
-        VH := Vertices(H);
-        for e in H_edges do
-            AddEdge(~H,VH[e[1]],VH[e[2]]);
-        end for;
-
-        continue;
-    end if;
+    end for;
 
 until not changed;
 
+print "\n=== MultiGraph H ===";
 
+printf "\nTotal vertices in MultiGraph H: %o\n", total_H;
+//print H;
 // _______________________ EXPORT TO SAGE _______________________________
 // ____________________
 printf "\n Copy the following into SageMath to produce the REDUCED GRAPH \n";
