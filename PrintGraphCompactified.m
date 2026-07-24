@@ -1,12 +1,19 @@
 A<x,y> := AffineSpace(Rationals(),2);
+
+
 // ______________input________________
 
 //Input the value for the power of t:
 k := 3;
 //Input a polynomial in terms of x and y (and k if needed):
 curve := -x^5+y^2;
+
 // ___________________________________
+
+
 printf "Data for equation %o and parameter k=%o\n\n", curve, k;
+
+
 //_____________Subordinate Functions_______________
 string_type_solution := function(u, v, a)
     u := Integers()!u;
@@ -524,6 +531,7 @@ for i in [1..#EG] do
 end for;
 printf "]\n";
 printf "original_vertices = [ ]\n";
+H_arrow_vertices := [];  //Forgets which vertices originally came from arrows; for the purposes of Sage plotting, treat them all as ordinary vertices.
 printf "arrow_vertices = [";
 for i in [1..#H_arrow_vertices] do
     if i lt #H_arrow_vertices then
