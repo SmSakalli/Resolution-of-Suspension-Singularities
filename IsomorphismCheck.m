@@ -10,7 +10,7 @@ curve := x^5-y^2;
 start  := 10;
 finish := 1000;
 
-// conjectured period of the graphs
+// period of the graphs
 num    := 10;
 // ___________________________________
 
@@ -582,8 +582,8 @@ for i in [num+1..finish] do
 end for; 
 
 if isom_check then
-    print "\nConjecture HOLDS for all k in [", start, "..", finish, "] with period", num;
+    print "\nStatement HOLDS for all k in [", start, "..", finish, "] with period", num;
 else
-    print "\nConjecture FAILS — see mismatches above";
+    print "\nStatement FAILS — see mismatches above";
 end if;
 
