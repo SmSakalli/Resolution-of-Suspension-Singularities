@@ -582,8 +582,8 @@ for i in [num+1..finish] do
 end for; 
 
 if isom_check then
-    print "\nStatement HOLDS for all k in [", start, "..", finish, "] with period", num;
+    print "\nIsomorphisms HOLD for all k in [", start, "..", finish, "] with period", num;
 else
-    print "\nStatement FAILS — see mismatches above";
+    print "\nIsomorphisms FAIL — see mismatches above";
 end if;
 
