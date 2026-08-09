@@ -7,7 +7,6 @@ curve := x^5-y^2;
 
 // k is the degree of t, for Nemethi's Algorithm 
 // range of k
-start  := 10;
 finish := 1000;
 
 // period of the graphs
@@ -582,7 +581,8 @@ for i in [num+1..finish] do
 end for; 
 
 if isom_check then
-    print "\nIsomorphisms HOLD for all k in [", start, "..", finish, "] with period", num;
+    print "\nIsomorphisms HOLD for all k in [1..", finish,
+      "] with period ", num;
 else
     print "\nIsomorphisms FAIL — see mismatches above";
 end if;
